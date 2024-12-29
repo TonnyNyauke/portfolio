@@ -4,6 +4,7 @@ export interface Technology {
   }
   
   export interface ProjectDetails {
+    id: string,
     title: string;
     description: string;
     longDescription: string;
@@ -13,4 +14,5 @@ export interface Technology {
     liveUrl?: string;
     date: string;
     category: string;
+    featured: boolean
   }
