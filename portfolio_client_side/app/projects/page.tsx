@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { getFeaturedProjects } from './projectData';
-import { Calendar, Tag, Search, Filter, ArrowLeft, ArrowRight, ChevronRight, Home } from 'lucide-react';
+import { Calendar, Tag, Search, ArrowLeft, ArrowRight, ChevronRight, Home } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
@@ -18,12 +18,6 @@ import {
 import { ProjectDetails } from './project';
 
 const ITEMS_PER_PAGE = 8;
-
-interface Props {
-  params: {
-    id: string;
-  }
-}
 
 const Breadcrumbs = () => (
   <nav aria-label="Breadcrumb" className="mb-6">
@@ -69,7 +63,7 @@ export default function ProjectsPage() {
     
     setProjects(filtered);
     setCurrentPage(1);
-  }, [searchQuery, selectedCategory]);
+  }, [searchQuery, selectedCategory, allProjects]);
 
   const totalPages = Math.ceil(projects.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -227,7 +221,7 @@ export default function ProjectsPage() {
         <div className="max-w-7xl mx-auto text-center py-12">
           <h3 className="text-xl font-medium text-gray-900 dark:text-gray-100">No projects found</h3>
           <p className="mt-2 text-gray-500 dark:text-gray-400">
-            Try adjusting your search or filter to find what you're looking for.
+            Try adjusting your search or filter to find what you&apos;re looking for.
           </p>
         </div>
       )}
