@@ -7,12 +7,10 @@ import { ProjectHeader } from '../ProjectHeader';
 import { ProjectContent } from '../ProjectContent';
 
 interface Props {
-  params: {
     id: string;
-  }
 }
 
-export default function ProjectDetails({ params }: Props) {
+export default function ProjectDetails(params: Props) {
   const project = getProjectById(params.id);
   
   if (!project) {
