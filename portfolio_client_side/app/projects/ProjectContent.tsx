@@ -3,7 +3,7 @@
 import React from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { ProjectDetails } from './project';
+import { ProjectDetails, Technology } from './project';
 
 interface ProjectContentProps {
   project: ProjectDetails;
@@ -41,7 +41,7 @@ export const ProjectContent: React.FC<ProjectContentProps> = ({ project }) => {
         className="prose dark:prose-invert max-w-none"
       >
         <div className="space-y-8">
-          {descriptionParagraphs.map((paragraph: any, index: React.Key | null | undefined) => {
+          {descriptionParagraphs.map((paragraph: string, index: React.Key | null | undefined) => {
             // Check if the paragraph is a list of features or technical details
             if (paragraph.includes('Key Features:') || 
                 paragraph.includes('Technical Challenges:') ||
@@ -81,7 +81,7 @@ export const ProjectContent: React.FC<ProjectContentProps> = ({ project }) => {
       >
         <h2 className="text-2xl font-bold mb-6">Technical Stack</h2>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {project.technologies.map((tech: any, index: React.Key | null | undefined) => (
+          {project.technologies.map((tech: Technology, index: React.Key | null | undefined) => (
             <div
               key={index}
               className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg text-center"

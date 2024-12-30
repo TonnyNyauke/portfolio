@@ -55,7 +55,7 @@ export const ProjectHeader: React.FC<ProjectHeaderProps> = ({ project }) => {
 
         {/* Technology Tags */}
         <div className="flex flex-wrap gap-2">
-          {project.technologies.map((tech: { name: string | number | bigint | boolean | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<string | number | bigint | boolean | React.ReactPortal | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | null | undefined> | null | undefined; }, index: React.Key | null | undefined) => (
+          {project.technologies.map((tech: { name: string}, index: React.Key | null | undefined) => (
             <span
               key={index}
               className="px-3 py-1 bg-gray-100 dark:bg-gray-700 rounded-full text-sm"
