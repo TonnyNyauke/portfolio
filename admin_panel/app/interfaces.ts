@@ -4,15 +4,16 @@ export interface Technology {
   }
   
   export interface ProjectDetails {
-    id: string,
+    id: string;  // Make id required
     title: string;
     description: string;
     longDescription: string;
     image: string;
-    technologies: Technology[];
-    githubUrl?: string;
-    liveUrl?: string;
-    date: string;
+    githubUrl: string;
+    liveUrl: string;
     category: string;
-    featured: boolean
+    technologies: Technology[];
+    featured: boolean;
+    createdAt?: Date;
+    updatedAt?: Date;
   }

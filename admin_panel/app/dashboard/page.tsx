@@ -1,9 +1,16 @@
 'use client'
 
-import React, { useState, useEffect } from 'react';
-import { getDatabase, ref, set, push, remove, onValue } from 'firebase/database';
+import React, { useEffect, useState} from 'react';
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { Trash2, Plus, Save, Image, X, Edit2, Eye, Copy, LogOut } from 'lucide-react';
+import { 
+  collection, 
+  addDoc, 
+  deleteDoc, 
+  updateDoc, 
+  doc, 
+  getDocs 
+} from 'firebase/firestore';
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -40,6 +47,20 @@ import { toast } from '@/hooks/use-toast';
 
 // ... (previous interfaces and Firebase setup) ...
 
+// Add a defaultProject constant
+const defaultProject: ProjectDetails = {
+  id: '',
+  title: '',
+  description: '',
+  longDescription: '',
+  image: '',
+  githubUrl: '',
+  liveUrl: '',
+  category: '',
+  technologies: [],
+  featured: false
+};
+
 const projectSchema = z.object({
   title: z.string().min(1, "Title is required"),
   description: z.string().min(1, "Description is required"),
@@ -61,6 +82,31 @@ export default function AdminPanel() {
   const [newTechnology, setNewTechnology] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
+  // Add this useEffect to fetch projects
+useEffect(() => {
+  const fetchProjects = async () => {
+    try {
+      const projectsRef = collection(db, 'projects');
+      const snapshot = await getDocs(projectsRef);
+      const projectsData = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      })) as ProjectDetails[];
+      setProjects(projectsData);
+    } catch (error) {
+      console.error('Error fetching projects:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to fetch projects. Please refresh the page.',
+        variant: 'destructive'
+      });
+    }
+  };
+
+  fetchProjects();
+}, []); // Empty dependency array means this runs once on component mount
+
+
   if (loading) {
     return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
   }
@@ -68,6 +114,28 @@ export default function AdminPanel() {
   if (!user) {
     return <LoginPage />;
   }
+
+// Add missing technology handlers
+const handleAddTechnology = () => {
+  if (!editingProject || !newTechnology.trim()) return;
+
+  setEditingProject({
+    ...editingProject,
+    technologies: [...editingProject.technologies, { name: newTechnology.trim() }]
+  });
+  setNewTechnology('');
+};
+
+const handleRemoveTechnology = (index: number) => {
+  if (!editingProject) return;
+
+  const newTechnologies = [...editingProject.technologies];
+  newTechnologies.splice(index, 1);
+  setEditingProject({
+    ...editingProject,
+    technologies: newTechnologies
+  });
+};
 
   const validateProject = (project: ProjectDetails) => {
     try {
@@ -91,10 +159,11 @@ export default function AdminPanel() {
     };
     reader.readAsDataURL(file);
     
-    // Upload
-    const imageRef = storageRef(storage, `projects/${editingProject.id}/${file.name}`);
-    await uploadBytes(imageRef, file);
-    const imageUrl = await getDownloadURL(imageRef);
+    // Upload to Firebase Storage
+    const storage = getStorage(); // This is correct - importing from firebase/storage
+    const storageReference = storageRef(storage, `projects/${editingProject.id}/${file.name}`); // Use storageRef instead of ref
+    await uploadBytes(storageReference, file);
+    const imageUrl = await getDownloadURL(storageReference);
     
     setEditingProject({
       ...editingProject,
@@ -102,25 +171,38 @@ export default function AdminPanel() {
     });
   };
 
-  const handleDuplicateProject = async (project: ProjectDetails) => {
-    const duplicatedProject = {
-      ...project,
-      id: '',
-      title: `${project.title} (Copy)`,
-      featured: false
-    };
+  // const handleDuplicateProject = async (project: ProjectDetails) => {
+  //   const duplicatedProject = {
+  //     ...project,
+  //     title: `${project.title} (Copy)`,
+  //     featured: false,
+  //     createdAt: new Date()
+  //   };
     
-    const newProjectRef = push(ref(db, 'projects'));
-    await set(newProjectRef, {
-      ...duplicatedProject,
-      id: newProjectRef.key
-    });
+  //   // Remove the original ID before creating new document
+  //   delete duplicatedProject.id;
     
-    toast({
-      title: 'Project duplicated',
-      description: 'The project has been successfully duplicated.'
-    });
-  };
+  //   try {
+  //     const projectsRef = collection(db, 'projects');
+  //     const docRef = await addDoc(projectsRef, duplicatedProject);
+  //     // Update the project with its new ID
+  //     await updateDoc(doc(db, 'projects', docRef.id), {
+  //       id: docRef.id
+  //     });
+      
+  //     toast({
+  //       title: 'Project duplicated',
+  //       description: 'The project has been successfully duplicated.'
+  //     });
+  //   } catch (error) {
+  //     toast({
+  //       title: 'Error',
+  //       description: 'Failed to duplicate project. Please try again.',
+  //       variant: 'destructive'
+  //     });
+  //   }
+  // };
+  
 
   const handleBatchDelete = async () => {
     if (selectedProjects.size === 0) return;
@@ -128,20 +210,29 @@ export default function AdminPanel() {
     const confirmDelete = window.confirm(`Delete ${selectedProjects.size} selected projects?`);
     if (!confirmDelete) return;
     
-    for (const projectId of selectedProjects) {
-      await remove(ref(db, `projects/${projectId}`));
+    try {
+      const deletePromises = Array.from(selectedProjects).map(projectId => 
+        deleteDoc(doc(db, 'projects', projectId))
+      );
+      await Promise.all(deletePromises);
+      
+      setSelectedProjects(new Set());
+      toast({
+        title: 'Batch delete successful',
+        description: `${selectedProjects.size} projects have been deleted.`
+      });
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Failed to delete some projects. Please try again.',
+        variant: 'destructive'
+      });
     }
-    
-    setSelectedProjects(new Set());
-    toast({
-      title: 'Batch delete successful',
-      description: `${selectedProjects.size} projects have been deleted.`
-    });
   };
 
   const handleSave = async () => {
     if (!editingProject) return;
-
+  
     const validation = validateProject(editingProject);
     if (!validation.valid) {
       toast({
@@ -151,18 +242,26 @@ export default function AdminPanel() {
       });
       return;
     }
-
+  
     try {
       if (isNewProject) {
-        const newProjectRef = push(ref(db, 'projects'));
-        await set(newProjectRef, {
+        const projectsRef = collection(db, 'projects');
+        const docRef = await addDoc(projectsRef, {
           ...editingProject,
-          id: newProjectRef.key
+          createdAt: new Date()
+        });
+        // Update the project with its new ID
+        await updateDoc(doc(db, 'projects', docRef.id), {
+          id: docRef.id
         });
       } else {
-        await set(ref(db, `projects/${editingProject.id}`), editingProject);
+        const projectRef = doc(db, 'projects', editingProject.id);
+        await updateDoc(projectRef, {
+          ...editingProject,
+          updatedAt: new Date()
+        });
       }
-
+  
       setIsDialogOpen(false);
       setEditingProject(null);
       setIsNewProject(false);
@@ -181,9 +280,30 @@ export default function AdminPanel() {
     }
   };
 
-    function handleDelete(id: string): void {
-        throw new Error('Function not implemented.');
+  // Update handleDelete to handle undefined id
+  const handleDelete = async (projectId: string | undefined) => {
+    if (!projectId) return;
+
+    const confirmDelete = window.confirm('Are you sure you want to delete this project?');
+    if (!confirmDelete) return;
+  
+    try {
+      await deleteDoc(doc(db, 'projects', projectId));
+      // Update local state after successful deletion
+      setProjects(projects.filter(p => p.id !== projectId));
+      toast({
+        title: 'Success',
+        description: 'Project deleted successfully.'
+      });
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Failed to delete project. Please try again.',
+        variant: 'destructive'
+      });
     }
+  };
+
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-8">
@@ -213,8 +333,10 @@ export default function AdminPanel() {
             <DialogTrigger asChild>
               <Button
                 onClick={() => {
-                  setEditingProject(defaultProject);
+                  setEditingProject({...defaultProject}); // Create a new object each time
                   setIsNewProject(true);
+                  setIsDialogOpen(true);
+                  setImagePreview(null); // Clear any previous image preview
                 }}
               >
                 <Plus className="w-4 h-4 mr-2" />
@@ -241,7 +363,7 @@ export default function AdminPanel() {
                       />
                     </div>
                     <div>
-                      <Label>Category</Label>
+                      {/* <Label>Category</Label>
                       <Select
                         value={editingProject.category}
                         onValueChange={(value) => setEditingProject({
@@ -259,7 +381,7 @@ export default function AdminPanel() {
                             </SelectItem>
                           ))}
                         </SelectContent>
-                      </Select>
+                      </Select> */}
                     </div>
                   </div>
 
@@ -481,14 +603,14 @@ export default function AdminPanel() {
                     <Edit2 className="w-4 h-4 mr-2" />
                     Edit
                   </Button>
-                  <Button
+                  {/* <Button
                     variant="outline"
                     size="sm"
                     onClick={() => handleDuplicateProject(project)}
                   >
                     <Copy className="w-4 h-4 mr-2" />
                     Duplicate
-                  </Button>
+                  </Button> */}
                   <Button
                     variant="outline"
                     size="sm"
