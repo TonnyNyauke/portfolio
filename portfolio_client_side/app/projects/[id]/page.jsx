@@ -5,14 +5,9 @@ import { getProjectById } from '../projectData';
 import { ProjectHeader } from '../ProjectHeader';
 import { ProjectContent } from '../ProjectContent';
 
-interface PageProps {
-  params: {
-    id: string;
-  }
-}
 
-export default async function ProjectDetails({ params }: PageProps) {
-  const project = await getProjectById(params.id);
+export default function ProjectDetails({ params }) {
+  const project = getProjectById(params.id);
   
   if (!project) {
     notFound();
