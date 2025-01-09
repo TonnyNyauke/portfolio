@@ -1,4 +1,5 @@
 import { ProjectDetails } from './project';
+import file from '../../public/file.svg'
 
 export const projectData: ProjectDetails[] = [
   {
@@ -16,7 +17,7 @@ Key Features:
 
 Technical Challenges:
 One of the main challenges was handling real-time updates for multiple users simultaneously while maintaining performance. This was solved using WebSocket connections and efficient data structures for state management.`,
-    image: "/api/placeholder/1200/600",
+    image: file,
     technologies: [
       { name: "React" },
       { name: "Next.js" },
