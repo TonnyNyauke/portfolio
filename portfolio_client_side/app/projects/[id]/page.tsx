@@ -11,8 +11,8 @@ interface PageProps {
   }
 }
 
-export default function ProjectDetails({ params }: PageProps) {
-  const project = getProjectById(params.id);
+export default async function ProjectDetails({ params }: PageProps) {
+  const project = await getProjectById(params.id);
   
   if (!project) {
     notFound();
