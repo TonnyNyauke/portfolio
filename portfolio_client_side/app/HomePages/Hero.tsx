@@ -31,7 +31,7 @@ export default function Hero() {
             {...fadeInUp}
             className="text-lg md:text-xl text-blue-600 dark:text-blue-400 font-medium mb-4 block"
           >
-            Hi, I'm Tonny Nyauke 👋
+            Hi, I&apos;m Tonny Nyauke 👋
           </motion.span>
           
           <motion.h1 
@@ -84,7 +84,7 @@ export default function Hero() {
               href="/contact" 
               className="px-8 py-3 border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors"
             >
-              Let's Connect
+              Let&apos;s Connect
             </Link>
           </motion.div>
 
