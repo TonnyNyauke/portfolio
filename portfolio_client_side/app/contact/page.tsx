@@ -113,7 +113,7 @@ export default function ContactPage() {
     {
       icon: MessageSquare,
       method: 'Contact Form',
-      time: 'Within 48 hours'
+      time: 'Within 24 hours'
     }
   ]
 
