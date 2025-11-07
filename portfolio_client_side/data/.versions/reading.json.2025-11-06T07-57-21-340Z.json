@@ -1,0 +1,18 @@
+{
+  "books": [
+    {
+      "id": "1762404858235",
+      "title": "Supabase",
+      "author": "Nyauke",
+      "genre": "Tech",
+      "currentPage": 0,
+      "totalPages": 400,
+      "startDate": "2025-11-06",
+      "status": "want-to-read",
+      "coverColor": "from-green-400 to-blue-500",
+      "thoughts": "",
+      "review": "",
+      "notes": []
+    }
+  ]
+}

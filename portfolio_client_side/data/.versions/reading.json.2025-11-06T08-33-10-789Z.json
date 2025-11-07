@@ -1,0 +1,32 @@
+{
+  "books": [
+    {
+      "id": "1762404858235",
+      "title": "Supabase",
+      "author": "Nyauke",
+      "genre": "Tech",
+      "currentPage": 5,
+      "totalPages": 400,
+      "startDate": "2025-11-06",
+      "status": "currently-reading",
+      "coverColor": "from-green-400 to-blue-500",
+      "thoughts": "Lit",
+      "review": "Nice",
+      "notes": []
+    },
+    {
+      "id": "1762417934031",
+      "title": "Direct From Dell",
+      "author": "Michael Dell",
+      "genre": "Business",
+      "currentPage": 400,
+      "totalPages": 400,
+      "startDate": "2025-08-06",
+      "status": "finished",
+      "coverColor": "from-blue-400 to-indigo-500",
+      "thoughts": "",
+      "review": "",
+      "notes": []
+    }
+  ]
+}

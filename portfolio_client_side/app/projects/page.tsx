@@ -1,7 +1,8 @@
+//app/projects
 'use client'
 
 import React, { useState, useEffect } from 'react';
-import { getFeaturedProjects } from './projectData';
+import { projectData } from './projectData';
 import { Calendar, Tag, Search, ArrowLeft, ArrowRight, ChevronRight, Home } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -37,7 +38,7 @@ const Breadcrumbs = () => (
 );
 
 export default function ProjectsPage() {
-  const allProjects = getFeaturedProjects();
+  const allProjects = projectData;
   const [projects, setProjects] = useState<ProjectDetails[]>(allProjects);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
@@ -85,7 +86,7 @@ export default function ProjectsPage() {
   };
 
   return (
-    <main className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 px-4 sm:px-6 lg:px-8">
+    <main className="min-h-screen text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-900 py-8 px-4 sm:px-6 lg:px-8">
       {/* Mobile Breadcrumbs - Only visible on small screens */}
       <div className="block md:hidden max-w-7xl mx-auto">
         <Breadcrumbs />
@@ -167,10 +168,6 @@ export default function ProjectsPage() {
                   {project.description}
                 </p>
                 <div className="flex flex-wrap gap-2 text-sm">
-                  <div className="flex items-center text-gray-500 dark:text-gray-400">
-                    <Calendar className="w-4 h-4 mr-1" />
-                    {project.date}
-                  </div>
                   <div className="flex items-center text-gray-500 dark:text-gray-400">
                     <Tag className="w-4 h-4 mr-1" />
                     {project.category}

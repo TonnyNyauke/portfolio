@@ -51,10 +51,10 @@ export const ProjectContent: React.FC<ProjectContentProps> = ({ project }) => {
               const [title, ...items] = paragraph.split('\n');
               return (
                 <div key={index} className="space-y-4">
-                  <h2 className="text-2xl font-bold">{title}</h2>
+                  <h2 className="text-2xl font-bold text-white dark:text-white">{title}</h2>
                   <ul className="list-disc pl-6 space-y-2">
                     {items.map((item: string, itemIndex: React.Key | null | undefined) => (
-                      <li key={itemIndex} className="text-gray-600 dark:text-gray-300">
+                      <li key={itemIndex} className="text-white dark:text-gray-200">
                         {item.replace('• ', '')}
                       </li>
                     ))}
@@ -64,7 +64,7 @@ export const ProjectContent: React.FC<ProjectContentProps> = ({ project }) => {
             }
             // Regular paragraph
             return (
-              <p key={index} className="text-gray-600 dark:text-gray-300 leading-relaxed">
+              <p key={index} className="text-white dark:text-gray-200 leading-relaxed">
                 {paragraph}
               </p>
             );
@@ -79,15 +79,15 @@ export const ProjectContent: React.FC<ProjectContentProps> = ({ project }) => {
         transition={{ duration: 0.6, delay: 0.6 }}
         className="mt-12 pt-12 border-t border-gray-200 dark:border-gray-700"
       >
-        <h2 className="text-2xl font-bold mb-6">Technical Stack</h2>
+        <h2 className="text-2xl font-bold mb-6 text-white dark:text-white">Technical Stack</h2>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {project.technologies.map((tech: Technology, index: React.Key | null | undefined) => (
             <div
               key={index}
-              className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg text-center"
+              className="p-4 bg-gray-100 dark:bg-gray-800 rounded-lg text-center border border-gray-200 dark:border-gray-700"
             >
               {tech.icon && <span className="block text-2xl mb-2">{tech.icon}</span>}
-              <span className="text-sm font-medium">{tech.name}</span>
+              <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{tech.name}</span>
             </div>
           ))}
         </div>
