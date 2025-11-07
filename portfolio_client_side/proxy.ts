@@ -8,7 +8,7 @@ export function proxy(request: NextRequest) {
   // Only apply to admin paths
   const isAdminPath = pathname.startsWith('/admin') || pathname.startsWith('/api/admin');
   
-  if (!isAdminPath) {
+  if (isAdminPath) {
     return NextResponse.next();
   }
 
