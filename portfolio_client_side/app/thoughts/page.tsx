@@ -35,7 +35,7 @@ export default function ThoughtsPage() {
   useEffect(() => {
     async function fetchThoughts() {
       try {
-        const res = await fetch('/api/admin/blogs');
+        const res = await fetch('/api/blogs');
         const data = await res.json();
         setThoughts(data.blogs || []);
       } catch (error) {

@@ -80,7 +80,7 @@ export default function AdventureDetailPage() {
   useEffect(() => {
     async function fetchAdventure() {
       try {
-        const res = await fetch(`/api/admin/adventures/${params.id}`, { cache: 'no-store' })
+        const res = await fetch(`/api/adventures/${params.id}`, { cache: 'no-store' })
         const data = await res.json()
         setAdventure(data.adventure)
         setRelatedContent(data.related || [])

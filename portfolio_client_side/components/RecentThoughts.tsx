@@ -79,7 +79,7 @@ export default function RecentThoughts() {
   useEffect(() => {
     async function fetchThoughts() {
       try {
-        const res = await fetch('/api/admin/blogs', { cache: 'no-store' })
+        const res = await fetch('/api/blogs', { cache: 'no-store' })
         const data = await res.json()
         setMyThoughts(data.blogs || [])
       } catch (error) {

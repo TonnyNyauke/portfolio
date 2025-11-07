@@ -46,7 +46,7 @@ export default function ThoughtDetailPage() {
     
     async function fetchThought() {
       try {
-        const res = await fetch(`/api/admin/blogs/${thoughtId}`);
+        const res = await fetch(`/api/blogs/${thoughtId}`);
         if (!res.ok) throw new Error('Failed to fetch thought');
         
         const data = await res.json();
@@ -54,7 +54,7 @@ export default function ThoughtDetailPage() {
         
         // Fetch related thoughts (you'll need to implement this endpoint)
         try {
-          const relatedRes = await fetch(`/api/admin/blogs?category=${data.blog.category}&exclude=${thoughtId}&limit=3`);
+          const relatedRes = await fetch(`/api/blogs?category=${data.blog.category}&exclude=${thoughtId}&limit=3`);
           if (relatedRes.ok) {
             const relatedData = await relatedRes.json();
             setRelatedThoughts(relatedData.blogs || []);

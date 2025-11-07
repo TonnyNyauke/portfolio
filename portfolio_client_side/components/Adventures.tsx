@@ -40,7 +40,7 @@ export default function Adventures() {
 
   const fetchAdventures = async () => {
     try {
-      const res = await fetch('/api/admin/adventures')
+      const res = await fetch('/api/adventures')
       const data = await res.json()
       setAdventures(data.adventures || [])
     } catch (error) {

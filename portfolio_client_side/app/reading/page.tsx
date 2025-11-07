@@ -36,7 +36,7 @@ const ReadingPage: React.FC = () => {
   useEffect(() => {
     async function fetchBooks() {
       try {
-        const res = await fetch('/api/admin/reading', { cache: 'no-store' });
+        const res = await fetch('/api/reading', { cache: 'no-store' });
         const data = await res.json();
         setBooks(data.books || []);
       } catch (error) {
