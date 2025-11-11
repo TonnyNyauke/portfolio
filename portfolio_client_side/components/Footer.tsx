@@ -87,12 +87,12 @@ export default function Footer() {
                 >
                   <Instagram className="w-5 h-5 mr-2" />
                 </Link>
-                <Link 
+                {/* <Link 
                   href="https://x.com/TonnyNyauke" target='_blank' 
                   className="p-2 rounded-lg bg-slate-800 text-slate-400 hover:text-blue-400 hover:bg-slate-700 transition-colors"
                 >
                   <Twitter className="w-5 h-5" />
-                </Link>
+                </Link> */}
                 <Link 
                   href="www.linkedin.com/in/tonnynyauke" target='_blank' 
                   className="p-2 rounded-lg bg-slate-800 text-slate-400 hover:text-blue-400 hover:bg-slate-700 transition-colors"

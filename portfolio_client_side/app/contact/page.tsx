@@ -73,14 +73,14 @@ export default function ContactPage() {
       description: 'Best for detailed discussions',
       color: 'from-blue-500 to-blue-600'
     },
-    {
-      icon: Twitter,
-      title: 'Twitter/X',
-      value: '@TonnyNyauke',
-      href: 'https://x.com/TonnyNyauke',
-      description: 'Quick questions and updates',
-      color: 'from-sky-500 to-sky-600'
-    },
+    // {
+    //   icon: Twitter,
+    //   title: 'Twitter/X',
+    //   value: '@TonnyNyauke',
+    //   href: 'https://x.com/TonnyNyauke',
+    //   description: 'Quick questions and updates',
+    //   color: 'from-sky-500 to-sky-600'
+    // },
     {
       icon: Linkedin,
       title: 'LinkedIn',
@@ -105,11 +105,11 @@ export default function ContactPage() {
       method: 'Email',
       time: 'Within 24 hours'
     },
-    {
-      icon: Twitter,
-      method: 'Twitter/X',
-      time: 'Within a few hours'
-    },
+    // {
+    //   icon: Twitter,
+    //   method: 'Twitter/X',
+    //   time: 'Within a few hours'
+    // },
     {
       icon: MessageSquare,
       method: 'Contact Form',
@@ -132,14 +132,14 @@ export default function ContactPage() {
               variants={fadeInUp}
               className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-slate-800 via-blue-700 to-indigo-700 dark:from-slate-200 dark:via-blue-300 dark:to-indigo-300 bg-clip-text text-transparent"
             >
-              Let's Work Together
+              Let&apos;s Work Together
             </motion.h1>
             <motion.p
               variants={fadeInUp}
               className="text-xl text-slate-600 dark:text-slate-300 leading-relaxed max-w-2xl mx-auto"
             >
               Have a project in mind? Want to collaborate? Or just want to say hi? 
-              I'd love to hear from you. Choose your preferred way to connect below.
+              I&apos;d love to hear from you. Choose your preferred way to connect below.
             </motion.p>
           </motion.div>
         </div>
@@ -200,7 +200,7 @@ export default function ContactPage() {
                   Send Me a Message
                 </h2>
                 <p className="text-slate-600 dark:text-slate-400 mb-8">
-                  Fill out the form below and I'll get back to you as soon as possible.
+                  Fill out the form below and I&apos;ll get back to you as soon as possible.
                 </p>
 
                 {status === 'success' && (
@@ -211,7 +211,7 @@ export default function ContactPage() {
                   >
                     <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400" />
                     <p className="text-green-700 dark:text-green-300">
-                      Message sent successfully! I'll get back to you soon.
+                      Message sent successfully! I&apos;ll get back to you soon.
                     </p>
                   </motion.div>
                 )}
@@ -241,7 +241,7 @@ export default function ContactPage() {
                         onChange={handleChange}
                         required
                         className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                        placeholder="John Doe"
+                        placeholder="e.g Brian Ochieng"
                       />
                     </div>
                     <div>
@@ -256,7 +256,7 @@ export default function ContactPage() {
                         onChange={handleChange}
                         required
                         className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                        placeholder="john@example.com"
+                        placeholder="e.g brian@example.com"
                       />
                     </div>
                   </div>
@@ -381,7 +381,7 @@ export default function ContactPage() {
                   <span className="font-medium">Open to opportunities</span>
                 </div>
                 <p className="text-sm text-blue-100">
-                  I'm currently available for freelance projects, consulting, and collaboration opportunities.
+                  I&apos;m currently available for freelance projects, consulting, and collaboration opportunities.
                 </p>
               </div>
             </motion.div>

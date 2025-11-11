@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Book, Filter, Grid, List, BookOpen, CheckCircle, MessageSquare, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 
@@ -48,18 +48,83 @@ const ReadingPage: React.FC = () => {
     fetchBooks();
   }, []);
 
-  const readingStats = {
-    currentStreak: 23,
-    pagesThisWeek: books.reduce((sum, book) => {
-      if (book.status === 'currently-reading') {
-        return sum + Math.min(book.currentPage, 200); // Estimate weekly pages
+  const readingStats = useMemo(() => {
+    // Calculate pages this week
+    const now = new Date();
+    const startOfWeek = new Date(now);
+    startOfWeek.setDate(now.getDate() - now.getDay()); // Start of current week (Sunday)
+    startOfWeek.setHours(0, 0, 0, 0);
+
+    let pagesThisWeek = 0;
+    
+    books.forEach(book => {
+      // Get notes from this week
+      const notesThisWeek = book.notes?.filter(note => {
+        const noteDate = new Date(note.date);
+        return noteDate >= startOfWeek;
+      }) || [];
+
+      if (notesThisWeek.length > 0) {
+        // Calculate pages based on note progression
+        const maxPageThisWeek = Math.max(...notesThisWeek.map(n => n.page));
+        const previousMaxPage = book.notes
+          ?.filter(note => {
+            const noteDate = new Date(note.date);
+            return noteDate < startOfWeek;
+          })
+          .map(n => n.page)
+          .reduce((max, page) => Math.max(max, page), 0) || 0;
+        
+        pagesThisWeek += Math.max(0, maxPageThisWeek - previousMaxPage);
+      } else if (book.status === 'currently-reading') {
+        // If book was started this week, use currentPage as estimate
+        const startDate = new Date(book.startDate);
+        if (startDate >= startOfWeek) {
+          pagesThisWeek += book.currentPage;
+        }
       }
-      return sum;
-    }, 0),
-    pagesThisMonth: books.reduce((sum, book) => sum + book.currentPage, 0),
-    booksFinished: books.filter(b => b.status === 'finished').length,
-    averagePagesPerDay: 28
-  };
+    });
+
+    // Calculate pages this month
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    startOfMonth.setHours(0, 0, 0, 0);
+
+    let pagesThisMonth = 0;
+    
+    books.forEach(book => {
+      // Get notes from this month
+      const notesThisMonth = book.notes?.filter(note => {
+        const noteDate = new Date(note.date);
+        return noteDate >= startOfMonth;
+      }) || [];
+
+      if (notesThisMonth.length > 0) {
+        // Calculate pages based on note progression
+        const maxPageThisMonth = Math.max(...notesThisMonth.map(n => n.page));
+        const previousMaxPage = book.notes
+          ?.filter(note => {
+            const noteDate = new Date(note.date);
+            return noteDate < startOfMonth;
+          })
+          .map(n => n.page)
+          .reduce((max, page) => Math.max(max, page), 0) || 0;
+        
+        pagesThisMonth += Math.max(0, maxPageThisMonth - previousMaxPage);
+      } else if (book.status === 'currently-reading') {
+        // If book was started this month, use currentPage as estimate
+        const startDate = new Date(book.startDate);
+        if (startDate >= startOfMonth) {
+          pagesThisMonth += book.currentPage;
+        }
+      }
+    });
+
+    return {
+      pagesThisWeek,
+      pagesThisMonth,
+      booksFinished: books.filter(b => b.status === 'finished').length
+    };
+  }, [books]);
 
   const filteredBooks = selectedGenre === 'all' 
     ? books 
@@ -179,11 +244,7 @@ const ReadingPage: React.FC = () => {
         </div>
 
         {/* Reading Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-12">
-          <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-xl p-4 text-center">
-            <div className="text-2xl font-bold text-orange-500 mb-1">{readingStats.currentStreak}</div>
-            <div className="text-sm text-gray-600 dark:text-gray-400">Day Streak</div>
-          </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-12">
           <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-xl p-4 text-center">
             <div className="text-2xl font-bold text-blue-500 mb-1">{readingStats.pagesThisWeek}</div>
             <div className="text-sm text-gray-600 dark:text-gray-400">Pages This Week</div>
@@ -195,10 +256,6 @@ const ReadingPage: React.FC = () => {
           <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-xl p-4 text-center">
             <div className="text-2xl font-bold text-purple-500 mb-1">{readingStats.booksFinished}</div>
             <div className="text-sm text-gray-600 dark:text-gray-400">Books Finished</div>
-          </div>
-          <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-xl p-4 text-center">
-            <div className="text-2xl font-bold text-indigo-500 mb-1">{readingStats.averagePagesPerDay}</div>
-            <div className="text-sm text-gray-600 dark:text-gray-400">Avg Pages/Day</div>
           </div>
         </div>
 

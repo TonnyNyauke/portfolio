@@ -40,9 +40,9 @@ export default function AdminThoughts() {
   async function load() {
     setLoading(true);
     try {
-      const res = await fetch('/api/admin/blogs', { cache: 'no-store' });
+      const res = await fetch('/api/blogs', { cache: 'no-store' });
       const data = await res.json();
-      setThoughts(data.thoughts || []);
+      setThoughts(data.blogs || []);
     } catch (error) {
       console.error('Failed to load thoughts:', error);
     }
