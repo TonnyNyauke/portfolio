@@ -54,8 +54,16 @@ export async function readJsonFile<T>(relativePath: string, fallback: T): Promis
 export async function writeJsonFile<T>(relativePath: string, data: T): Promise<void> {
   const fullPath = join(DATA_DIR, relativePath);
   const dir = dirname(fullPath);
-  await ensureDir(dir);
-  await ensureDir(VERSIONS_DIR);
+  
+  try {
+    await ensureDir(dir);
+    await ensureDir(VERSIONS_DIR);
+  } catch (err: any) {
+    if (err.code === 'EACCES' || err.code === 'EROFS') {
+      throw new Error(`Permission denied: Cannot write to ${DATA_DIR}. In production, consider using a database or external storage. Error: ${err.message}`);
+    }
+    throw err;
+  }
 
   const json = JSON.stringify(data, null, 2);
 
@@ -66,13 +74,23 @@ export async function writeJsonFile<T>(relativePath: string, data: T): Promise<v
     const versionPath = join(VERSIONS_DIR, `${relativePath.replace(/[\\/]/g, '_')}.${timestamp}.json`);
     await fs.writeFile(versionPath, existing, 'utf8');
   } catch (err: any) {
-    // ignore if no existing file
+    // ignore if no existing file or backup fails
+    if (err.code !== 'ENOENT') {
+      console.warn('Failed to create backup:', err.message);
+    }
   }
 
   // Atomic write via temp file then rename
-  const tmpPath = `${fullPath}.tmp`;
-  await fs.writeFile(tmpPath, json, 'utf8');
-  await fs.rename(tmpPath, fullPath);
+  try {
+    const tmpPath = `${fullPath}.tmp`;
+    await fs.writeFile(tmpPath, json, 'utf8');
+    await fs.rename(tmpPath, fullPath);
+  } catch (err: any) {
+    if (err.code === 'EACCES' || err.code === 'EROFS') {
+      throw new Error(`Permission denied: Cannot write to ${fullPath}. The filesystem may be read-only in production. Consider using a database or setting DATA_DIR to a writable location like /tmp. Error: ${err.message}`);
+    }
+    throw err;
+  }
 }
 
 export async function listBackups(relativePath: string): Promise<string[]> {

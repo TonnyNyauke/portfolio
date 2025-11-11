@@ -84,10 +84,19 @@ export default function AdminThoughts() {
     if (!confirm('Are you sure you want to delete this thought?')) return;
     
     try {
-      await fetch(`/api/admin/blogs/${id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/admin/blogs/${id}`, { method: 'DELETE' });
+      const data = await res.json();
+      
+      if (!res.ok) {
+        alert(`Failed to delete thought: ${data.error || 'Unknown error'}`);
+        console.error('Delete failed:', data);
+        return;
+      }
+      
       await load();
     } catch (error) {
       console.error('Failed to delete thought:', error);
+      alert('Failed to delete thought. Please check the console for details.');
     }
   }
 

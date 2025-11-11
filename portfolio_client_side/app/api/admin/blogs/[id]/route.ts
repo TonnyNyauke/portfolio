@@ -63,9 +63,27 @@ export async function DELETE(
   _: Request, 
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await params;
-  const blogs = await readJsonFile<Blog[]>(FILE, []);
-  const next = blogs.filter(b => b.id !== id);
-  await writeJsonFile(FILE, next);
-  return NextResponse.json({ ok: true });
+  try {
+    const { id } = await params;
+    if (!id) {
+      return NextResponse.json({ error: 'Blog ID is required' }, { status: 400 });
+    }
+    
+    const blogs = await readJsonFile<Blog[]>(FILE, []);
+    const blogExists = blogs.some(b => b.id === id);
+    
+    if (!blogExists) {
+      return NextResponse.json({ error: 'Blog not found' }, { status: 404 });
+    }
+    
+    const next = blogs.filter(b => b.id !== id);
+    await writeJsonFile(FILE, next);
+    return NextResponse.json({ ok: true, message: 'Blog deleted successfully' });
+  } catch (e: any) {
+    console.error('Error deleting blog:', e);
+    return NextResponse.json({ 
+      error: e?.message || 'Failed to delete blog',
+      details: process.env.NODE_ENV === 'development' ? e?.stack : undefined
+    }, { status: 500 });
+  }
 }
