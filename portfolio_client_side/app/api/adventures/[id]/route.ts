@@ -51,7 +51,7 @@ export async function GET(
         id: b.id,
         title: b.title,
         type: 'blog' as const,
-        date: b.date
+        date: b.created_at
       }))
     } catch (error) {
       console.warn('Unable to load blogs for related content:', error)

@@ -105,12 +105,12 @@ export default function RecentThoughts() {
     // Sort by date (newest first)
     return filtered.sort((a, b) => {
       // Handle special cases
-      if (a.date === 'currently-reading') return -1
-      if (b.date === 'currently-reading') return 1
+      if (a.created_at === 'currently-reading') return -1
+      if (b.created_at === 'currently-reading') return 1
       
       // Parse dates and sort
-      const dateA = new Date(a.date)
-      const dateB = new Date(b.date)
+      const dateA = new Date(a.created_at)
+      const dateB = new Date(b.created_at)
       
       // Check for invalid dates
       if (isNaN(dateA.getTime())) return 1
@@ -193,7 +193,7 @@ export default function RecentThoughts() {
                         </span>
                         <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
                           <Calendar className="w-4 h-4" />
-                          <span>{getRelativeTime(thought.date)}</span>
+                          <span>{getRelativeTime(thought.created_at)}</span>
                           {thought.readTime && (
                             <>
                               <span>•</span>
