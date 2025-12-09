@@ -7,12 +7,12 @@ export type Blog = {
   category?: 'Business' | 'Tech' | 'Faith' | 'Others';
   excerpt: string;
   content: string;
-  date: string;
+  created_at: string;
   readTime: string;
   tags: string[];
   featured: boolean;
   views?: number;
-  coverImage?: string;
+  file_url?: string;
 };
 
 

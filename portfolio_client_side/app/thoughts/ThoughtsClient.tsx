@@ -17,7 +17,7 @@ interface Thought {
   tags: string[];
   featured: boolean;
   views?: number;
-  coverImage?: string;
+  file_url?: string;
 }
 
 // Function to get relative time
@@ -299,10 +299,10 @@ export default function ThoughtsClientPage() {
                     transition={{ duration: 0.6, delay: 0.3 + index * 0.1 }}
                     className="group relative bg-white dark:bg-slate-800 rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 cursor-pointer"
                   >
-                    {thought.coverImage && (
+                    {thought.file_url && (
                       <div className="h-48 bg-gradient-to-br from-blue-500 to-indigo-600 overflow-hidden">
                         <div className="w-full h-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-400">
-                          Image Placeholder
+                          <img src={thought.file_url} alt={thought.title} className="w-full h-full object-cover" />
                         </div>
                       </div>
                     )}
@@ -326,7 +326,7 @@ export default function ThoughtsClientPage() {
                         <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
                           <span className="flex items-center gap-1">
                             <Clock className="w-4 h-4" />
-                            {thought.readTime} Minutes Read
+                            {thought.readTime}
                           </span>
                           {thought.views && (
                             <span className="flex items-center gap-1">

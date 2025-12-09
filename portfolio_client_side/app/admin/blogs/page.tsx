@@ -255,7 +255,7 @@ function ArticlesPage() {
   const [category, setCategory] = useState<Category>('Business');
   const [tags, setTags] = useState<string[]>([]);
   const [featured, setFeatured] = useState(false);
-  const [readTime, setReadTime] = useState('5 min read');
+  const [readTime, setReadTime] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -264,6 +264,24 @@ function ArticlesPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [readyToSubmit, setReadyToSubmit] = useState(false);
+
+  // Calculate read time based on word count
+  const calculateReadTime = (htmlContent: string): string => {
+    // Strip HTML tags and get plain text
+    const plainText = htmlContent.replace(/<[^>]*>/g, ' ');
+    // Count words (split by whitespace and filter empty strings)
+    const wordCount = plainText.trim().split(/\s+/).filter(word => word.length > 0).length;
+    // Calculate minutes at 250 words per minute
+    const minutes = Math.ceil(wordCount / 250);
+    
+    if (minutes < 1) {
+      return '< 1 min read';
+    } else if (minutes === 1) {
+      return '1 min read';
+    } else {
+      return `${minutes} min read`;
+    }
+  };
 
   const editor = useEditor({
     extensions: [
@@ -294,6 +312,27 @@ function ArticlesPage() {
     content: '',
     immediatelyRender: false,
   });
+
+  // Update read time when editor content changes
+  useEffect(() => {
+    if (editor) {
+      const updateReadTime = () => {
+        const content = editor.getHTML();
+        if (content && content !== '<p></p>') {
+          const calculatedTime = calculateReadTime(content);
+          setReadTime(calculatedTime);
+        } else {
+          setReadTime('');
+        }
+      };
+
+      editor.on('update', updateReadTime);
+      
+      return () => {
+        editor.off('update', updateReadTime);
+      };
+    }
+  }, [editor]);
 
   // Load articles
   async function loadArticles() {
@@ -429,7 +468,7 @@ function ArticlesPage() {
     setCategory('Business');
     setTags([]);
     setFeatured(false);
-    setReadTime('5 min read');
+    setReadTime('');
     setReadyToSubmit(false);
     setEditingId(null);
     editor?.commands.clearContent();
@@ -659,10 +698,13 @@ function ArticlesPage() {
                 </label>
                 <Input
                   type="text"
-                  placeholder="e.g., 5 min read"
+                  placeholder="Auto-calculated based on content"
                   value={readTime}
                   onChange={(e) => setReadTime(e.target.value)}
                 />
+                <p className="text-xs text-gray-500 mt-1">
+                  Auto-calculated at 250 words/min. You can override if needed.
+                </p>
               </div>
 
               <div>

@@ -3,7 +3,7 @@
 
 import React, { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
-import { Calendar, Clock, Tag, Twitter, Linkedin, Link as LinkIcon, ArrowLeft, Mail, CheckCircle, TrendingUp, ArrowRight } from 'lucide-react'
+import { Calendar, Clock, Tag, Twitter, Linkedin, Link as LinkIcon, ArrowLeft, Mail, CheckCircle, TrendingUp, ArrowRight, MessageCircle } from 'lucide-react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 
@@ -13,10 +13,11 @@ interface Thought {
   category: string;
   excerpt: string;
   content: string;
-  date: string;
+  created_at: string;
   readTime: string;
   tags: string[];
   coverImage?: string;
+  file_url?: string; // Added this field
   views?: number;
 }
 
@@ -121,6 +122,7 @@ export default function ThoughtDetailContent() {
     const urls: Record<string, string> = {
       twitter: `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(shareUrl)}`,
       linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`,
+      whatsapp: `https://whatsapp.com/channel/0029Vb75wO347XeGSGu0UY0r`,
       copy: shareUrl
     };
     
@@ -151,34 +153,6 @@ export default function ThoughtDetailContent() {
     return colors[category] || 'from-gray-500 to-gray-600';
   };
 
-  // Render markdown content
-  const renderMarkdown = (content: string) => {
-    // Basic markdown rendering
-    return content.split('\n').map((line, i) => {
-      // Headings
-      if (line.startsWith('### ')) {
-        const text = line.slice(4);
-        const id = text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-        return <h3 key={i} id={id} className="text-xl font-bold text-gray-900 dark:text-white mt-6 mb-3">{text}</h3>;
-      }
-      if (line.startsWith('## ')) {
-        const text = line.slice(3);
-        const id = text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-        return <h2 key={i} id={id} className="text-2xl font-bold text-gray-900 dark:text-white mt-8 mb-4">{text}</h2>;
-      }
-      if (line.startsWith('# ')) {
-        const text = line.slice(2);
-        const id = text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-        return <h1 key={i} id={id} className="text-3xl font-bold text-gray-900 dark:text-white mt-8 mb-4">{text}</h1>;
-      }
-      // Paragraphs
-      if (line.trim()) {
-        return <p key={i} className="mb-4">{line}</p>;
-      }
-      return <br key={i} />;
-    });
-  };
-
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-slate-800 dark:to-indigo-900 flex items-center justify-center">
@@ -202,6 +176,9 @@ export default function ThoughtDetailContent() {
       </div>
     );
   }
+
+  // Get the featured image URL - check both coverImage and file_url
+  const featuredImage = thought.coverImage || thought.file_url;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-slate-800 dark:to-indigo-900">
@@ -253,6 +230,19 @@ export default function ThoughtDetailContent() {
                     </a>
                   ))}
                 </nav>
+
+                {/* WhatsApp Channel CTA in Sidebar */}
+                <div className="mt-8 p-4 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl text-white">
+                  <MessageCircle className="w-8 h-8 mb-2" />
+                  <h4 className="font-bold text-sm mb-2">Join My WhatsApp Channel</h4>
+                  <p className="text-xs text-green-50 mb-3">Get exclusive insights & updates</p>
+                  <button
+                    onClick={() => handleShare('whatsapp')}
+                    className="w-full px-3 py-2 bg-white text-green-600 rounded-lg text-sm font-semibold hover:bg-green-50 transition-colors"
+                  >
+                    Join Channel
+                  </button>
+                </div>
               </div>
             </aside>
           )}
@@ -261,10 +251,10 @@ export default function ThoughtDetailContent() {
           <main className={tocItems.length > 0 ? "lg:col-span-9" : "lg:col-span-12"}>
             <article className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-700">
               {/* Cover Image */}
-              {thought.coverImage && (
+              {featuredImage && (
                 <div className="h-96 bg-gradient-to-br from-blue-500 to-indigo-600 overflow-hidden">
                   <img 
-                    src={thought.coverImage} 
+                    src={featuredImage} 
                     alt={thought.title}
                     className="w-full h-full object-cover"
                   />
@@ -284,7 +274,7 @@ export default function ThoughtDetailContent() {
                     </span>
                     <span className="text-gray-500 dark:text-gray-400 flex items-center gap-2">
                       <Calendar className="w-4 h-4" />
-                      {new Date(thought.date).toLocaleDateString('en-US', { 
+                      {new Date(thought.created_at).toLocaleDateString('en-US', { 
                         year: 'numeric', 
                         month: 'long', 
                         day: 'numeric' 
@@ -292,7 +282,7 @@ export default function ThoughtDetailContent() {
                     </span>
                     <span className="text-gray-500 dark:text-gray-400 flex items-center gap-2">
                       <Clock className="w-4 h-4" />
-                      {thought.readTime} Minutes Read
+                      {thought.readTime}
                     </span>
                     {thought.views !== undefined && (
                       <span className="text-gray-500 dark:text-gray-400 flex items-center gap-2">
@@ -332,18 +322,28 @@ export default function ThoughtDetailContent() {
                       <button
                         onClick={() => handleShare('twitter')}
                         className="p-2 bg-gray-100 dark:bg-slate-700 hover:bg-blue-500 hover:text-white rounded-lg transition-all"
+                        title="Share on Twitter"
                       >
                         <Twitter className="w-5 h-5" />
                       </button>
                       <button
                         onClick={() => handleShare('linkedin')}
                         className="p-2 bg-gray-100 dark:bg-slate-700 hover:bg-blue-700 hover:text-white rounded-lg transition-all"
+                        title="Share on LinkedIn"
                       >
                         <Linkedin className="w-5 h-5" />
                       </button>
                       <button
+                        onClick={() => handleShare('whatsapp')}
+                        className="p-2 bg-gray-100 dark:bg-slate-700 hover:bg-green-500 hover:text-white rounded-lg transition-all"
+                        title="Join WhatsApp Channel"
+                      >
+                        <MessageCircle className="w-5 h-5" />
+                      </button>
+                      <button
                         onClick={() => handleShare('copy')}
                         className="p-2 bg-gray-100 dark:bg-slate-700 hover:bg-gray-300 dark:hover:bg-slate-600 rounded-lg transition-all"
+                        title="Copy link"
                       >
                         <LinkIcon className="w-5 h-5" />
                       </button>
@@ -365,6 +365,29 @@ export default function ThoughtDetailContent() {
                 </motion.div>
               </div>
             </article>
+
+            {/* WhatsApp Channel CTA - Mobile/Tablet */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.25 }}
+              className="mt-8 lg:hidden bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl p-8 text-white"
+            >
+              <div className="max-w-2xl mx-auto text-center">
+                <MessageCircle className="w-12 h-12 mx-auto mb-4" />
+                <h3 className="text-2xl font-bold mb-2">Join My WhatsApp Channel</h3>
+                <p className="text-green-100 mb-6">
+                  Get exclusive insights, updates, and thoughts delivered directly to WhatsApp.
+                </p>
+                <button
+                  onClick={() => handleShare('whatsapp')}
+                  className="px-8 py-3 bg-white text-green-600 rounded-lg font-semibold hover:bg-green-50 transition-colors inline-flex items-center gap-2"
+                >
+                  <MessageCircle className="w-5 h-5" />
+                  Join Channel
+                </button>
+              </div>
+            </motion.div>
 
             {/* Newsletter CTA */}
             <motion.div
@@ -431,7 +454,7 @@ export default function ThoughtDetailContent() {
                           {related.excerpt}
                         </p>
                         <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
-                          <span>{related.readTime} Minutes Read</span>
+                          <span>{related.readTime}</span>
                           <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                         </div>
                       </article>

@@ -14,7 +14,7 @@ function dbToBlog(row: any): Blog {
     tags: row.tags || [],
     featured: row.featured,
     views: row.views || 0,
-    coverImage: row.cover_image || undefined,
+    file_url: row.file_url || undefined,
   }
 }
 
@@ -31,7 +31,7 @@ function blogToDb(blog: Partial<Blog>): any {
     tags: blog.tags || [],
     featured: blog.featured ?? false,
     views: blog.views || 0,
-    cover_image: blog.coverImage || null,
+    file_url: blog.file_url || null,
   }
 }
 
@@ -109,7 +109,7 @@ export async function updateBlog(id: string, updates: Partial<Blog>): Promise<Bl
   if (updates.tags !== undefined) updateData.tags = updates.tags
   if (updates.featured !== undefined) updateData.featured = updates.featured
   if (updates.views !== undefined) updateData.views = updates.views
-  if (updates.coverImage !== undefined) updateData.cover_image = updates.coverImage
+  if (updates.file_url !== undefined) updateData.file_url = updates.file_url
 
   const { data, error } = await supabase
     .from('blogs')
