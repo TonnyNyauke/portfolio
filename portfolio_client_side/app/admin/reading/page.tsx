@@ -53,7 +53,7 @@ export default function AdminReading() {
 
   async function load() {
     setLoading(true);
-    const res = await fetch('/api/admin/reading', { cache: 'no-store' });
+    const res = await fetch('/api/reading', { cache: 'no-store' });
     const data = await res.json();
     setBooks(data.books || []);
     setLoading(false);
@@ -65,7 +65,7 @@ export default function AdminReading() {
 
   async function createBook(e: React.FormEvent) {
     e.preventDefault();
-    const res = await fetch('/api/admin/reading', {
+    const res = await fetch('/api/reading', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(form),
@@ -88,7 +88,7 @@ export default function AdminReading() {
 
   async function deleteBook(id: string) {
     if (!confirm('Delete this book? This will also delete all notes.')) return;
-    await fetch(`/api/admin/reading/${id}`, { method: 'DELETE' });
+    await fetch(`/api/reading/${id}`, { method: 'DELETE' });
     await load();
   }
 

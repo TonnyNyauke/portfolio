@@ -1,30 +1,46 @@
 import { NextResponse } from 'next/server'
-import { readJsonFile } from '@/lib/fileStore'
+import { getAllBlogs, createBlog } from '@/lib/db/blogs'
 import type { Blog } from '@/app/api/admin/blogs/route'
 
-const FILE = 'blogs.json'
-
 export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url)
+  try {
+    const { searchParams } = new URL(request.url)
 
-  const category = searchParams.get('category')?.toLowerCase()
-  const exclude = searchParams.get('exclude')
-  const limit = Number.parseInt(searchParams.get('limit') ?? '', 10)
+    const category = searchParams.get('category')
+    const exclude = searchParams.get('exclude')
+    const limit = Number.parseInt(searchParams.get('limit') ?? '', 10)
 
-  let blogs = await readJsonFile<Blog[]>(FILE, [])
+    const blogs = await getAllBlogs({
+      category: category || undefined,
+      exclude: exclude || undefined,
+      limit: Number.isNaN(limit) ? undefined : limit,
+    })
 
-  if (category) {
-    blogs = blogs.filter(blog => blog.category?.toLowerCase() === category)
+    return NextResponse.json({ blogs })
+  } catch (error: any) {
+    console.error('Error fetching blogs:', error)
+    return NextResponse.json(
+      { error: error?.message || 'Failed to fetch blogs' },
+      { status: 500 }
+    )
   }
+}
 
-  if (exclude) {
-    blogs = blogs.filter(blog => blog.id !== exclude)
+export async function POST(request: Request) {
+  try {
+    const body = (await request.json()) as Partial<Blog>
+    if (!body.title) {
+      return NextResponse.json({ error: 'title is required' }, { status: 400 })
+    }
+
+    const blog = await createBlog(body)
+    return NextResponse.json({ blog })
+  } catch (e: any) {
+    console.error('Error creating blog:', e)
+    return NextResponse.json({ 
+      error: e?.message || 'Failed to create blog',
+      details: process.env.NODE_ENV === 'development' ? e?.stack : undefined
+    }, { status: 500 })
   }
-
-  if (!Number.isNaN(limit) && limit > 0) {
-    blogs = blogs.slice(0, limit)
-  }
-
-  return NextResponse.json({ blogs })
 }
 

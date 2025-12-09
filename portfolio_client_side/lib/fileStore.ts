@@ -1,7 +1,25 @@
 import { promises as fs } from 'fs';
 import { dirname, join } from 'path';
 
-const DATA_DIR = process.env.DATA_DIR || 'data';
+// Get the data directory
+// IMPORTANT: For persistence, commit your JSON files to git in the 'data/' directory
+// - Committed files ARE persistent (deployed with your code)
+// - Runtime-written files are NOT persistent in serverless (filesystem is read-only)
+function getDataDir(): string {
+  if (process.env.DATA_DIR) {
+    return process.env.DATA_DIR;
+  }
+  
+  // Always use 'data' directory - files committed to git are persistent
+  // In serverless, we can READ from committed files, but cannot WRITE at runtime
+  // For writes, you'll need to either:
+  // 1. Use a database (recommended for production)
+  // 2. Commit changes back to git via GitHub API (complex)
+  // 3. Use a hybrid: read from committed files, write to external storage
+  return 'data';
+}
+
+const DATA_DIR = getDataDir();
 const VERSIONS_DIR = join(DATA_DIR, '.versions');
 
 async function ensureDir(path: string) {
@@ -35,6 +53,15 @@ export async function readJsonFile<T>(relativePath: string, fallback: T): Promis
     return JSON.parse(raw) as T;
   } catch (err: any) {
     if (err.code === 'ENOENT') {
+      // Note: In production, committed files in 'data/' are persistent
+      // Runtime-written files are not persistent in serverless environments
+      if (process.env.NODE_ENV === 'production') {
+        console.warn(
+          `File ${relativePath} not found. ` +
+          `Note: In serverless, only committed files in git are persistent. ` +
+          `Runtime writes are lost. Consider using a database for runtime writes.`
+        );
+      }
       await ensureDir(dirname(fullPath));
       await writeJsonFile(relativePath, fallback);
       return fallback;
@@ -60,7 +87,13 @@ export async function writeJsonFile<T>(relativePath: string, data: T): Promise<v
     await ensureDir(VERSIONS_DIR);
   } catch (err: any) {
     if (err.code === 'EACCES' || err.code === 'EROFS') {
-      throw new Error(`Permission denied: Cannot write to ${DATA_DIR}. In production, consider using a database or external storage. Error: ${err.message}`);
+      throw new Error(
+        `Permission denied: Cannot write to ${DATA_DIR} in production. ` +
+        `In serverless environments, the filesystem is read-only. ` +
+        `Committed JSON files in git ARE persistent and can be read. ` +
+        `For runtime writes, use a database (PostgreSQL, MongoDB, Supabase). ` +
+        `Original error: ${err.message}`
+      );
     }
     throw err;
   }
@@ -87,7 +120,13 @@ export async function writeJsonFile<T>(relativePath: string, data: T): Promise<v
     await fs.rename(tmpPath, fullPath);
   } catch (err: any) {
     if (err.code === 'EACCES' || err.code === 'EROFS') {
-      throw new Error(`Permission denied: Cannot write to ${fullPath}. The filesystem may be read-only in production. Consider using a database or setting DATA_DIR to a writable location like /tmp. Error: ${err.message}`);
+      throw new Error(
+        `Permission denied: Cannot write to ${fullPath} in production. ` +
+        `The filesystem is read-only in serverless environments. ` +
+        `Note: Committed JSON files in git ARE persistent and work for reads. ` +
+        `For runtime writes, use a database. ` +
+        `Original error: ${err.message}`
+      );
     }
     throw err;
   }

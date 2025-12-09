@@ -359,9 +359,9 @@ export default function ThoughtDetailContent() {
                   transition={{ duration: 0.6, delay: 0.2 }}
                   className="prose prose-lg dark:prose-invert max-w-none mt-8"
                 >
-                  <div className="text-gray-700 dark:text-gray-300 leading-relaxed space-y-6">
-                    {renderMarkdown(thought.content)}
-                  </div>
+                  <div className="text-gray-700 dark:text-gray-300 leading-relaxed space-y-6"
+                    dangerouslySetInnerHTML={{ __html: thought.content }}
+                  />
                 </motion.div>
               </div>
             </article>

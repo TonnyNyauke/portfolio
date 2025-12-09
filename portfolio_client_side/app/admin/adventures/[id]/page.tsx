@@ -62,7 +62,7 @@ export default function EditAdventurePage() {
   const fetchAdventure = async () => {
     try {
       console.log('Fetching adventure:', params.id)
-      const res = await fetch(`/api/admin/adventures/${params.id}`)
+      const res = await fetch(`/api/adventures/${params.id}`)
       
       console.log('Response status:', res.status)
       console.log('Response headers:', res.headers.get('content-type'))
@@ -133,7 +133,7 @@ export default function EditAdventurePage() {
     setError('')
 
     try {
-      const res = await fetch('/api/admin/adventures', {
+      const res = await fetch(`/api/adventures/${params.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)

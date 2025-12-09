@@ -1,7 +1,7 @@
 // app/thoughts/ThoughtsClient.tsx
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Search, Filter, Calendar, Clock, ArrowRight, TrendingUp, Sparkles, Tag } from 'lucide-react'
 import Link from 'next/link'
@@ -12,12 +12,58 @@ interface Thought {
   category: string;
   excerpt: string;
   content: string;
-  date: string;
+  created_at: string;
   readTime: string;
   tags: string[];
   featured: boolean;
   views?: number;
   coverImage?: string;
+}
+
+// Function to get relative time
+function getRelativeTime(created_at: string): string {
+  const now = new Date();
+  const date = new Date(created_at);
+  const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+  
+  // Less than a minute
+  if (diffInSeconds < 60) {
+    return 'just now';
+  }
+  
+  // Less than an hour
+  const diffInMinutes = Math.floor(diffInSeconds / 60);
+  if (diffInMinutes < 60) {
+    return `${diffInMinutes} ${diffInMinutes === 1 ? 'minute' : 'minutes'} ago`;
+  }
+  
+  // Less than a day
+  const diffInHours = Math.floor(diffInMinutes / 60);
+  if (diffInHours < 24) {
+    return `${diffInHours} ${diffInHours === 1 ? 'hour' : 'hours'} ago`;
+  }
+  
+  // Less than a week
+  const diffInDays = Math.floor(diffInHours / 24);
+  if (diffInDays < 7) {
+    return `${diffInDays} ${diffInDays === 1 ? 'day' : 'days'} ago`;
+  }
+  
+  // Less than a month
+  const diffInWeeks = Math.floor(diffInDays / 7);
+  if (diffInWeeks < 4) {
+    return `${diffInWeeks} ${diffInWeeks === 1 ? 'week' : 'weeks'} ago`;
+  }
+  
+  // Less than a year
+  const diffInMonths = Math.floor(diffInDays / 30);
+  if (diffInMonths < 12) {
+    return `${diffInMonths} ${diffInMonths === 1 ? 'month' : 'months'} ago`;
+  }
+  
+  // Years
+  const diffInYears = Math.floor(diffInDays / 365);
+  return `${diffInYears} ${diffInYears === 1 ? 'year' : 'years'} ago`;
 }
 
 export default function ThoughtsClientPage() {
@@ -32,7 +78,6 @@ export default function ThoughtsClientPage() {
   
   const thoughtsPerPage = 9;
 
-  // YOUR ORIGINAL FETCH - UNCHANGED
   useEffect(() => {
     async function fetchThoughts() {
       try {
@@ -63,7 +108,7 @@ export default function ThoughtsClientPage() {
     })
     .sort((a, b) => {
       if (sortBy === 'newest') {
-        return new Date(b.date).getTime() - new Date(a.date).getTime();
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
       }
       return (b.views || 0) - (a.views || 0);
     });
@@ -268,7 +313,7 @@ export default function ThoughtsClientPage() {
                         </span>
                         <span className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1">
                           <Calendar className="w-4 h-4" />
-                          {new Date(thought.date).toLocaleDateString()}
+                          {getRelativeTime(thought.created_at)}
                         </span>
                       </div>
                       <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
@@ -331,7 +376,7 @@ export default function ThoughtsClientPage() {
                 <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
                   <span className="flex items-center gap-1">
                     <Calendar className="w-4 h-4" />
-                    {new Date(thought.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                    {getRelativeTime(thought.created_at)}
                   </span>
                   <span className="flex items-center gap-1">
                     <Clock className="w-4 h-4" />

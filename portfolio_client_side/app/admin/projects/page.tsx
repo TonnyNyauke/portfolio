@@ -32,7 +32,7 @@ export default function AdminProjects() {
 
   async function load() {
     setLoading(true);
-    const res = await fetch('/api/admin/projects', { cache: 'no-store' });
+    const res = await fetch('/api/projects', { cache: 'no-store' });
     const data = await res.json();
     setProjects(data.projects || []);
     setLoading(false);
@@ -66,7 +66,7 @@ export default function AdminProjects() {
     if (form.liveUrl) formData.append('liveUrl', form.liveUrl);
     if (imageFile) formData.append('image', imageFile);
     
-    const res = await fetch('/api/admin/projects', { method: 'POST', body: formData });
+    const res = await fetch('/api/projects', { method: 'POST', body: formData });
     if (res.ok) {
       setForm({ title: '', description: '', longDescription: '', category: 'General', featured: false, technologies: [] });
       setImageFile(null);
@@ -77,7 +77,7 @@ export default function AdminProjects() {
 
   async function deleteProject(id: string) {
     if (confirm('Are you sure you want to delete this project?')) {
-      await fetch(`/api/admin/projects/${id}`, { method: 'DELETE' });
+      await fetch(`/api/projects/${id}`, { method: 'DELETE' });
       await load();
     }
   }

@@ -49,7 +49,7 @@ export default function AdminReadingEdit() {
   async function loadBook() {
     setLoading(true);
     try {
-      const res = await fetch(`/api/admin/reading/${bookId}`, { cache: 'no-store' });
+      const res = await fetch(`/api/reading/${bookId}`, { cache: 'no-store' });
       if (!res.ok) throw new Error('Failed to load');
       const data = await res.json();
       setBook(data.book);
@@ -67,8 +67,8 @@ export default function AdminReadingEdit() {
     
     setSaving(true);
     try {
-      const res = await fetch(`/api/admin/reading/${bookId}`, {
-        method: 'PATCH',
+      const res = await fetch(`/api/reading/${bookId}`, {
+        method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(book),
       });
@@ -87,7 +87,7 @@ export default function AdminReadingEdit() {
     if (!noteForm.page || !noteForm.note) return;
     
     try {
-      const res = await fetch(`/api/admin/reading/${bookId}/notes`, {
+      const res = await fetch(`/api/reading/${bookId}/notes`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -112,7 +112,7 @@ export default function AdminReadingEdit() {
     if (!confirm('Delete this note?')) return;
     
     try {
-      const res = await fetch(`/api/admin/reading/${bookId}/notes?noteId=${noteId}`, {
+      const res = await fetch(`/api/reading/${bookId}/notes?noteId=${noteId}`, {
         method: 'DELETE',
       });
       if (!res.ok) throw new Error('Failed to delete');

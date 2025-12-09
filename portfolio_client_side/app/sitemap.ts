@@ -1,7 +1,7 @@
 // app/sitemap.ts
 import { MetadataRoute } from 'next'
 import { readJsonFile } from '@/lib/fileStore'
-import { projectData } from '@/app/projects/projectData'
+import { getAllProjects } from '@/lib/db/projects'
 import type { Blog } from '@/app/api/admin/blogs/route'
 import type { Adventure } from '@/app/api/admin/adventures/route'
  
@@ -39,12 +39,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }
 
   // Dynamic routes - fetch projects
-  const projectRoutes = projectData.map((project) => ({
-    url: `${baseUrl}/projects/${project.id}`,
-    lastModified: project.date ? new Date(project.date).toISOString() : new Date().toISOString(),
-    changeFrequency: 'monthly' as const,
-    priority: project.featured ? 0.9 : 0.7,
-  }))
+  let projectRoutes: MetadataRoute.Sitemap = []
+  try {
+    const projects = await getAllProjects()
+    projectRoutes = projects.map((project) => ({
+      url: `${baseUrl}/projects/${project.id}`,
+      lastModified: project.date ? new Date(project.date).toISOString() : new Date().toISOString(),
+      changeFrequency: 'monthly' as const,
+      priority: project.featured ? 0.9 : 0.7,
+    }))
+  } catch (error) {
+    console.error('Error fetching projects for sitemap:', error)
+  }
 
   // Dynamic routes - fetch adventures
   let adventureRoutes: MetadataRoute.Sitemap = []

@@ -1,29 +1,34 @@
 import { NextResponse } from 'next/server'
-import { readJsonFile } from '@/lib/fileStore'
-
-type BookNote = { id: string; page: number; note: string; date: string; chapter?: string }
-type Book = {
-  id: string
-  title: string
-  author: string
-  genre: 'Business' | 'Tech' | 'Christian' | 'Others'
-  currentPage: number
-  totalPages: number
-  startDate: string
-  status: 'currently-reading' | 'finished' | 'want-to-read'
-  coverColor?: string
-  rating?: number
-  thoughts?: string
-  review?: string
-  notes: BookNote[]
-}
-
-type ReadingData = { books: Book[] }
-
-const FILE = '/reading.json'
+import { getAllBooks, createBook } from '@/lib/db/books'
 
 export async function GET() {
-  const data = await readJsonFile<ReadingData>(FILE, { books: [] })
-  return NextResponse.json(data)
+  try {
+    const books = await getAllBooks()
+    return NextResponse.json({ books })
+  } catch (error: any) {
+    console.error('Error fetching books:', error)
+    return NextResponse.json(
+      { error: error?.message || 'Failed to fetch books' },
+      { status: 500 }
+    )
+  }
+}
+
+export async function POST(request: Request) {
+  try {
+    const body = await request.json()
+    if (!body.title || !body.author) {
+      return NextResponse.json({ error: 'title and author are required' }, { status: 400 })
+    }
+
+    const book = await createBook(body)
+    return NextResponse.json({ book })
+  } catch (e: any) {
+    console.error('Error creating book:', e)
+    return NextResponse.json({ 
+      error: e?.message || 'Failed to create book',
+      details: process.env.NODE_ENV === 'development' ? e?.stack : undefined
+    }, { status: 500 })
+  }
 }
 

@@ -59,7 +59,7 @@ export default function AdventuresAdminPanel() {
 
   const fetchAdventures = async () => {
     try {
-      const res = await fetch('/api/admin/adventures')
+      const res = await fetch('/api/adventures')
       const data = await res.json()
       setAdventures(data.adventures || [])
     } catch (error) {
@@ -121,11 +121,17 @@ export default function AdventuresAdminPanel() {
         id: editingId || generateId(formData.title + '-' + Date.now())
       }
 
-      const res = await fetch('/api/admin/adventures', {
-        method: editingId ? 'PUT' : 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(adventureData)
-      })
+      const res = editingId
+        ? await fetch(`/api/adventures/${editingId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(adventureData)
+          })
+        : await fetch('/api/adventures', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(adventureData)
+          })
 
       const data = await res.json()
 
@@ -155,10 +161,8 @@ export default function AdventuresAdminPanel() {
     if (!confirm('Are you sure you want to delete this adventure?')) return
 
     try {
-      const res = await fetch('/api/admin/adventures', {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id })
+      const res = await fetch(`/api/adventures/${id}`, {
+        method: 'DELETE'
       })
 
       const data = await res.json()

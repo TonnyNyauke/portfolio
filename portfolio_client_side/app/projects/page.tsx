@@ -2,7 +2,6 @@
 'use client'
 
 import React, { useState, useEffect } from 'react';
-import { projectData } from './projectData';
 import { Calendar, Tag, Search, ArrowLeft, ArrowRight, ChevronRight, Home } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -38,11 +37,29 @@ const Breadcrumbs = () => (
 );
 
 export default function ProjectsPage() {
-  const allProjects = projectData;
-  const [projects, setProjects] = useState<ProjectDetails[]>(allProjects);
+  const [allProjects, setAllProjects] = useState<ProjectDetails[]>([]);
+  const [projects, setProjects] = useState<ProjectDetails[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [loading, setLoading] = useState(true);
+
+  // Fetch projects from API
+  useEffect(() => {
+    async function fetchProjects() {
+      try {
+        const res = await fetch('/api/projects', { cache: 'no-store' });
+        const data = await res.json();
+        setAllProjects(data.projects || []);
+        setProjects(data.projects || []);
+      } catch (error) {
+        console.error('Error fetching projects:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchProjects();
+  }, []);
 
   // Get unique categories from projects
   const categories = ['all', ...new Set(allProjects.map(project => project.category))];
@@ -84,6 +101,16 @@ export default function ProjectsPage() {
     hidden: { opacity: 0, y: 20 },
     show: { opacity: 1, y: 0 }
   };
+
+  if (loading) {
+    return (
+      <main className="min-h-screen text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-900 py-8 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto text-center py-12">
+          <p className="text-gray-500 dark:text-gray-400">Loading projects...</p>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-900 py-8 px-4 sm:px-6 lg:px-8">

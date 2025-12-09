@@ -21,7 +21,7 @@ export default function EditBlog() {
   const [saving, setSaving] = useState(false);
 
   async function load() {
-    const res = await fetch(`/api/admin/blogs/${id}`, { cache: 'no-store' });
+    const res = await fetch(`/api/blogs/${id}`, { cache: 'no-store' });
     if (res.ok) {
       const data = await res.json();
       setBlog(data.blog);
@@ -31,7 +31,7 @@ export default function EditBlog() {
 
   async function save(updates: Partial<Blog>) {
     setSaving(true);
-    await fetch(`/api/admin/blogs/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(updates) });
+    await fetch(`/api/blogs/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(updates) });
     setSaving(false);
     await load();
   }

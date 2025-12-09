@@ -26,7 +26,7 @@ export default function EditProject() {
   const [imagePreview, setImagePreview] = useState<string>('');
 
   async function load() {
-    const res = await fetch(`/api/admin/projects/${id}`, { cache: 'no-store' });
+    const res = await fetch(`/api/projects/${id}`, { cache: 'no-store' });
     if (res.ok) {
       const data = await res.json();
       setProject(data.project);
@@ -66,7 +66,7 @@ export default function EditProject() {
       formData.append('image', imageFile);
     }
     
-    await fetch(`/api/admin/projects/${id}`, { method: 'PUT', body: formData });
+    await fetch(`/api/projects/${id}`, { method: 'PUT', body: formData });
     setSaving(false);
     await load();
   }
